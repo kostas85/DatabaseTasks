@@ -39,7 +39,8 @@ $assets = [
 ];
 $flashMessagesData = [
 	'flash_success' => array_key_exists('success', $flashMessages) ? $flashMessages['success']: [],
-	'flash_error' =>  array_key_exists('error', $flashMessages) ? $flashMessages['error'] : []
+	'flash_error' =>  array_key_exists('error', $flashMessages) ? $flashMessages['error'] : [],
+	'login' => !empty($_SESSION['login']) ? $_SESSION['login'] : ''
 ];
 $templateData = array_merge($assets, $flashMessagesData, $data['data']);
 echo $template->render($templateData);

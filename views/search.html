@@ -1,0 +1,24 @@
+{% extends 'main.html' %}
+{% block body %}
+<p>{{ query_string }}</p>
+<table class="table">
+	{% if users %}
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+	{% for user in users %}
+      <tr>
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+      </tr>
+	{% endfor %}  
+    </tbody>
+  </table>
+  {% else %}
+	<p>There are no users.</p>
+  {% endif %} 	
+{% endblock %}

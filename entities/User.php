@@ -136,7 +136,7 @@ class User {
 		$isValid = $this->validateRegistration($formData);
 		if ($isValid)
 		{
-			$shaPass = sha1($this->password);
+			$shaPass = sha1($this->password.$this->salt);
 			$db = Database::init();
 			$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			$statement = $db->prepare("INSERT INTO users(name,email,password,salt) VALUES(:name,:email,:password,:salt)");
@@ -157,8 +157,36 @@ class User {
 		$isValid = $this->validateLogin($formData);
 		if ($isValid)
 		{
-		
+			$email = $formData['email'];
+			$plainPassword = $formData['password'];
+			$db = Database::init();
+			$query = $db->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
+			$query->execute([$email]);
+			$row = $query->fetch();
+			$shaPassword = sha1($plainPassword. $row['salt']);
+			if ($row === false) {
+				Session::addErrorMessage('Wrong username/password');
+				return false;
+			}
+			if ($shaPassword !== $row['password']){
+				Session::addErrorMessage('Wrong username/password');
+				return false;
+			}
+			Session::logIn($email);
+			Session::addSuccessMessage('You are logged in!');
+			return true;
+			
+			
 		}
+
+	}
+	
+	public static function searchUsers($q){
+			$db = Database::init();
+			$query = $db->prepare("SELECT * FROM users WHERE email = ? OR name = ?");
+			$query->execute([$q, $q]);
+			$rows = $query->fetchAll();
+			return $rows;
 	}
 	
 }

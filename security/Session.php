@@ -39,6 +39,18 @@ class Session {
 		return $_SESSION['flash'];
 	}
 	
+	public static function logIn($email)
+	{
+		$_SESSION['login'] = $email;
+	}
+	
+	public static function logOut()
+	{
+		Session::addSuccessMessage('You are logged out!');
+		$_SESSION['login'] = '';
+		unset($_SESSION['login']);
+	}
+	
 	
 }
 
