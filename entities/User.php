@@ -3,6 +3,7 @@
 namespace App\Entities;
 use App\Security\Session;
 use App\Database\Database;
+use PDO;
 
 class User {
 	
@@ -26,6 +27,10 @@ class User {
 	{
 		if (array_keys($formData) === self::REGISTRATION_FORM)
 		{
+			$this->name = $formData['name'];
+			$this->email = $formData['email'];
+			$this->password = $formData['password'];
+			$this->salt = md5(rand(10,1000));
 			$this->doRegistration($formData);
 		}
 		
@@ -42,8 +47,9 @@ class User {
 		$c = $this->validatePassword($formData['password']);
 		$d = $this->validateRepeatPassword($formData['repeat_password']);
 		$e = $this->validatePasswordsAreTheSame($formData['password'], $formData['repeat_password']);
+		$f = $this->isUserNew($formData['email']);
 				
-		$result = $a && $b && $c && $d && $e;
+		$result = $a && $b && $c && $d && $e && $f;
 		
 		return $result;
 	}
@@ -113,17 +119,39 @@ class User {
 		return $result;
 	}
 	
+	private function isUserNew($email)
+	{
+		$db = Database::init();
+		$query = $db->prepare("SELECT count(*) FROM users WHERE email = ?");
+		$query->execute([$email]);
+		$count = $query->fetchColumn();
+		
+		if ($count > 0){
+			Session::addErrorMessage('User already exists');
+		}
+		return ($count <= 0);
+	}
+	
 	public function doRegistration($formData){
 		$isValid = $this->validateRegistration($formData);
 		if ($isValid)
 		{
+			$shaPass = sha1($this->password);
 			$db = Database::init();
-			$statement = $db->prepare("INSERT INTO users(name, email, password, salt`) VALUES($this->name, $this->email, sha1($this->password), md5(rand(10,1000))");
+			$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			$statement = $db->prepare("INSERT INTO users(name,email,password,salt) VALUES(:name,:email,:password,:salt)");
+			$statement->bindParam('name', $this->name);
+			$statement->bindParam('email', $this->email);
+			$statement->bindParam('password', $shaPass);
+			$statement->bindParam('salt', $this->salt);
 			$statement->execute();
-			Session::addErrorMessage('Registration Successful');
+		
+
+			Session::addSuccessMessage('Registration Successful');
 			
 		}
 	}
+	
 	
 	public function doLogin($formData){
 		$isValid = $this->validateLogin($formData);

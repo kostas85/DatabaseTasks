@@ -2,6 +2,6 @@
 $dbconfig = [
 	'username' => 'root',
 	'password' => '',
-	'name' => 'databasetask',
+	'dbname' => 'databasetask',
 	'host' => 'localhost',
 ];
