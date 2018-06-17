@@ -37,6 +37,14 @@
   </div>
 </nav>
 <div id="main">
+{% for error in flash_error %}
+<div class="alert alert-danger" role="alert">
+{{ error }}</div>
+{% endfor %}
+{% for success in flash_success %}
+<div class="alert alert-success" role="alert">
+{{ success }}</div>
+{% endfor %}
 <h1>{{ title }}</h1>
 {% block body %}{% endblock %}
 </div>

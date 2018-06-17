@@ -1,6 +1,6 @@
 {% extends 'main.html' %}
 {% block body %}
-<form>
+<form id="register" method="post" action="{{ path('register') }}">
   <div class="form-group">
     <label for="email">Email address</label>
     <input type="email" name="email" class="form-control" id="email" placeholder="Enter email">
